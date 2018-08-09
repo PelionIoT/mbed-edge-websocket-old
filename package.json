@@ -1,0 +1,27 @@
+{
+  "name": "mbed-edge-websocket",
+  "version": "1.0.0",
+  "description": "Library to deal with mbed Cloud Edge through websockets",
+  "main": "edge-lib.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:WigWagCo/mbed-edge-websocket.git"
+  },
+  "keywords": [
+    "mbed"
+  ],
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/WigWagCo/mbed-edge-websocket/issues"
+  },
+  "homepage": "https://github.com/WigWagCo/mbed-edge-websocket#readme",
+  "dependencies": {
+    "es6-promisify": "^5.0.0",
+    "json-rpc-ws": "^5.0.0",
+    "request": "^2.81.0"
+  }
+}
