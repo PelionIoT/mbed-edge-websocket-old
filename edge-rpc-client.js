@@ -133,14 +133,10 @@ EdgeRpcClient.prototype.sendRequest = async function(method, params) {
 }
 
 EdgeRpcClient.prototype.init = async function() {
-    await this.connect().then(
-        reply => console.log(SUCCESS, 'Connected to mbed Cloud Edge Websocket. Response: ', reply),
-        error => console.log(ERROR, 'Connection to mbed Cloud Edge Websocket failed. Error: ', error));
-
-    await this.registerProtocolTranslator().then(
-        reply => console.log(SUCCESS, 'Protocol translator registration successfull. Response: ', reply),
-        error => console.log(ERROR, 'Protocol translator registration failed. Error: ', error));
-    
+    await this.connect()
+    console.log(SUCCESS, 'Connected to mbed Cloud Edge Websocket')
+    var resp = await this.registerProtocolTranslator()
+    console.log(SUCCESS, 'Protocol translator registration successfull. Response: ', resp)
     this.exposeWriteMethod();
     this._is_open = true;
 };
