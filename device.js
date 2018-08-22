@@ -59,6 +59,12 @@ MbedDevice.prototype.$setResources = function(resources) {
 };
 
 MbedDevice.prototype.setValue = async function(path, value) {
+    if(this.resources[path].newValue === value){
+        this.resources[path].value = value
+        this.resources[path].newValue = null
+        return
+    }
+
     try {
         if (this.rpcClient && this.rpcClient.is_open) {
             await this.rpcClient._setValue(path, value);
@@ -206,18 +212,18 @@ MbedDevice.prototype.register = async function(lwm2m, supportsUpdate) {
 
         console.log(CON_PR, ID_PR, 'Opened RPC Channel');
 
-        rpc.on('resource-updated', (route, newValue) => {
+        rpc.on('resource-updated', (route, newValue, responseCB) => {
             route = '/' + route;
 
             if (this.resources[route]) {
-                this.resources[route].value = newValue;
+                this.resources[route].newValue = newValue;
             }
 
-            this.emit('put', route, newValue);
+            this.emit('put', route, newValue, responseCB);
         });
 
-        rpc.on('resource-executed', (route, data) => {
-            this.emit('post', '/' + route, data);
+        rpc.on('resource-executed', (route, data, responseCB) => {
+            this.emit('post', '/' + route, data, responseCB);
         });
 
         /*

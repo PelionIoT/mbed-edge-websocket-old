@@ -95,13 +95,13 @@ RPCClient.prototype._createResource = function(type, route, value, opr, observab
         }
     };
 
-    var onUpdated = (deviceId, r_route, buff) => {
+    var onUpdated = (deviceId, r_route, buff, responseCB) => {
         if (deviceId !== this.id) return;
         if (route !== r_route) return;
 
         let value = convertBuffToType(buff, this.routes[route].type);
         o.value = value;
-        this.emit('resource-updated', r_route, value);
+        this.emit('resource-updated', r_route, value, responseCB);
     };
 
     this.edgeRpc.on('resource-updated', onUpdated);
@@ -141,7 +141,7 @@ RPCClient.prototype.createFunction = function(route, callback) {
         callback: callback
     };
 
-    var onExecuted = (deviceId, r_route, buff) => {
+    var onExecuted = (deviceId, r_route, buff, responseCB) => {
         if (deviceId !== this.id) return;
         if (route !== r_route) return;
 
@@ -151,7 +151,7 @@ RPCClient.prototype.createFunction = function(route, callback) {
             callback(value);
         }
 
-        this.emit('resource-executed', r_route, value);
+        this.emit('resource-executed', r_route, value, responseCB);
     };
 
     this.edgeRpc.on('resource-executed', onExecuted);

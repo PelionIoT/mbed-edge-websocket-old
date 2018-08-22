@@ -76,32 +76,32 @@ EdgeRpcClient.prototype.exposeWriteMethod = function() {
         let operation = '';
         if (params.operation === OPERATIONS.WRITE) {
             operation = 'write';
-            this.emit('resource-updated', deviceId, route, valueBuf);
+            this.emit('resource-updated', deviceId, route, valueBuf, response);
         } else if (params.operation === OPERATIONS.EXECUTE) {
             operation = 'execute';
-            this.emit('resource-executed', deviceId, route, valueBuf);
+            this.emit('resource-executed', deviceId, route, valueBuf, response);
         } else {
             operation = 'unknown';
             console.log(WARN, 'Unknown "write" operation', params.operation, params);
+            response('Unknown operation', null)
         }
 
         received = {
+            raw_params: params,
             deviceId: deviceId,
-            resourcePath: resourcePath,
+            route: route,
             operation: operation,
-            value: value
+            value: valueBuf
         }
         console.log(INFO, 'Received a write method with data:');
         console.log(received);
-        console.log(INFO, 'The raw received JSONRPC 2.0 params:');
-        console.log(params);
 
         /* Always respond back to Mbed Edge, it is expecting
          * an success response to finish the write/execute action.
          * If an error is returned the value write is discarded
          * also in the Mbed Edge Core.
          */
-        response(/* no error */ null, /* success */ 'ok');
+        //response(/* no error */ null, /* success */ 'ok');
     });
 };
 
