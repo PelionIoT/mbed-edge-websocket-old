@@ -3,10 +3,10 @@ const JsonRpcWs = require('json-rpc-ws');
 const EventEmitter = require('events');
 //const promisify = require('es6-promisify');
 
-const INFO = '\x1b[34m[ClientService]\x1b[0m';
-const ERROR  = '\x1b[34m[ClientService]\x1b[31m';
-const SUCCESS  = '\x1b[34m[ClientService]\x1b[32m';
-const WARN = '\x1b[34m[ClientService]\x1b[33m';
+const INFO = '\x1b[34m[EdgeRpcClient]\x1b[0m';
+const ERROR  = '\x1b[34m[EdgeRpcClient]\x1b[31m';
+const SUCCESS  = '\x1b[34m[EdgeRpcClient]\x1b[32m';
+const WARN = '\x1b[34m[EdgeRpcClient]\x1b[33m';
 
 const OPERATIONS = {
     READ       : 0x01,
