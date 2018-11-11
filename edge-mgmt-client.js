@@ -85,6 +85,24 @@ EdgeMgmtClient.prototype.read_resource = async function(endpointName,uri) {
     });
 };
 
+EdgeMgmtClient.prototype.write_resource = async function(endpointName,uri,base64Value) {
+    let self = this;
+    return new Promise((resolve, reject) => {
+        let timeout = setTimeout(() => {
+            reject('Timeout');
+        }, TIMEOUT);
+
+        self.client.send('write_resource', {"endpointName": endpointName, "uri": uri, "base64Value": base64Value}, function(error, response) {
+            clearTimeout(timeout);
+            if (!error) {
+                resolve(response);
+            } else {
+                reject(error);
+            }
+        });
+    });
+};
+
 EdgeMgmtClient.prototype.init = async function() {
     await this.connect()
     console.log(SUCCESS, 'Connected to mbed Cloud Edge Websocket')
