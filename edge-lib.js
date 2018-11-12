@@ -37,6 +37,24 @@ RemoteClientService.prototype.init = async function() {
     setInterval(function() {
         self.edgeMgmt.getDevices().then(devices => {
             var registeredDevices = self.devices.filter(d => d.getRegistrationStatus());
+            for(var i = 0; i < self.mbedDevices.length; i++) {
+                var mbedDevice = self.mbedDevices[i];
+                if(devices.data.find(dev => {
+                        return dev.endpointName == mbedDevice.endpointName;
+                    }) == undefined) {
+                    DevJSDevice.remove(mbedDevice.endpointName);
+                    self.mbedDevices.splice(i,1)
+                } else {
+                    mbedDevice.resources.forEach(resource => {
+                        self.edgeMgmt.read_resource(mbedDevice.endpointName, resource.uri).then(val => {
+                            if(resource.val != parse(val.stringValue, val.type)) {
+                                console.log(CON_PR,mbedDevice.endpointName+" to be updated: resource "+resource.uri+" changed "+resource.val+"->"+parse(val.stringValue, val.type));
+                                //TODO: Write in devicejs
+                            }
+                        })
+                    })
+                }
+            }
             devices.data.forEach(device => {
                 if(registeredDevices.find(dev => {
                         return dev.endpoint == device.endpointName;
