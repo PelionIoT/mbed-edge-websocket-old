@@ -291,6 +291,27 @@ function CreateDevice(mbedDevice,edgeMgmtClient) {
     })
 }
 
+function RemoveDevice(id) {
+    return new Promise(function(resolve, reject) {
+        if(typeof devices[id] === 'undefined') {
+            return reject('Did not find resource named ' + id);
+        }
+        return devices[id].stop().then(function() {
+            delete devices[id];
+            resolve('Successfully stopped ' + id);
+        }, function(err){
+            if(err.status === 404) {
+                console.log('\x1b[33m Could not stop resource ' + id + JSON.stringify(err));
+                resolve();
+            } else {
+                console.log('\x1b[31m Stop failed with error ' + err + JSON.stringify(err));
+                reject(err);
+            }
+        });
+    })
+}
+
 module.exports = {
-    create: CreateDevice
+    create: CreateDevice,
+    remove: RemoveDevice
 };
