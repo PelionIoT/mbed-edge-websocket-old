@@ -10,6 +10,7 @@ function RemoteClientService(socket_path, pt_api_path, mgmt_api_path, name) {
     this.edgeMgmt = new EdgeMgmt(socket_path, mgmt_api_path, name);
 
     this.devices = [];
+    this.mbedDevices = [];
 }
 
 function parse(stringVal,type) {
@@ -32,23 +33,26 @@ RemoteClientService.prototype.init = async function() {
     var self = this;
     // Setup client to edge-core websocket api /1/mgmt
     self.edgeMgmt.init();
-    // Poll edge-core registered ddevices every 60 secs and for new found device, register it in devicejs
+    // Poll edge-core registered devices every 60 secs and for new found device, register it in devicejs
     setInterval(function() {
         self.edgeMgmt.getDevices().then(devices => {
             var registeredDevices = self.devices.filter(d => d.getRegistrationStatus());
             devices.data.forEach(device => {
-                if(registeredDevices.find(dev=> {
+                if(registeredDevices.find(dev => {
                         return dev.endpoint == device.endpointName;
+                    }) == undefined && self.mbedDevices.find(dev => {
+                        return dev.endpointName == device.endpointName;
                     }) == undefined) {
                     console.log(CON_PR, "Found new mbed device: "+device.endpointName);
                     var initialStates = {};
-                    await device.resources.forEach(resource => {
+                    device.resources.forEach(resource => {
                         self.edgeMgmt.read_resource(device.endpointName, resource.uri).then(val => {
                             resource.val = parse(val.stringValue, val.type);
                         })
                     })
-                    DevJSDevice(device).then(response => {
-                        console.log(CON_PR,"\x1b[32m Successfully registered "+device.endpointName+" in devicejs")
+                    DevJSDevice.create(device,self.edgeMgmt).then(response => {
+                        console.log(CON_PR,"\x1b[32m Successfully registered "+device.endpointName+" in devicejs");
+                        self.mbedDevices.push(device);
                     },reject => {
                         console.log(CON_PR,"\x1b[31m Failed to add "+device.endpointName+" in devicejs, err - "+reject);
                     })

@@ -207,6 +207,8 @@ var map = {
     }
 }
 
+var devices = {};
+
 function addResourceType(config) {
     return new Promise(function(resolve, reject) {
         dev$.addResourceType(config).then(function() {
@@ -217,7 +219,7 @@ function addResourceType(config) {
     });
 }
 
-function start(id, initStates, resourceConfig) {
+function start(id, initStates, resourceConfig, edgeMgmtClient) {
     var self = this;
     return new Promise(function(resolve, reject) {
         dev$.listInterfaceTypes().then(function(interfaceTypes) {
@@ -235,50 +237,60 @@ function start(id, initStates, resourceConfig) {
             });
             var Device = dev$.resource(resourceConfig.name, Dev);
             var device = new Device(id);
+
             device.start({
                 id: id,
                 supportedStates: devInterfaceStates,
-                initStates: initStates || {}
+                initStates: initStates || {},
+                edgeMgmtClient: edgeMgmtClient
             }).then(function() {
-                resolve();
+                resolve(device);
             }, function(err) {
-                reject(err);
+                if(typeof err.status !== 'undefined' && err.status == 500 && err.response == 'Already registered') {
+                    console.log("\x1b[33m "+id+" device controller already exists");
+                    resolve(device);
+                } else reject(err);
             });
         });
     });
 }
 
-function CreateDevice(mbedDevice) {
+function CreateDevice(mbedDevice,edgeMgmtClient) {
     var self = this;
     var id = mbedDevice.endpointName;
     var interfaces = [];
     var initStates = {};
-    await mbedDevice.resources.forEach(resource => {
-        if(map[resource.uri]) {
-            interfaces.push(map[resource.uri].interface);
-            initStates[map[resource.uri].state] = resource;
-        } else {
-            console.log("\x1b[33m Not supported resource: "+resource.uri)
-        }
-    })
 
-    var resourceconfig = {
-        "name": "Mbed/Resource-"+id,
-        "version": "0.0.1",
-        "interfaces": interfaces
-    }
-    addResourceType(resourceconfig).then(function(res) {
-        console.log('\x1b[32 Successfully added resource '+res);
-        start(id, initStates, resourceconfig).then(function() {
-            console.log('\x1b[32m Started controller with id ' + id);
+    return new Promise(function(resolve, reject) {
+        mbedDevice.resources.forEach(resource => {
+            if(map[resource.uri]) {
+                interfaces.push(map[resource.uri].interface);
+                initStates[map[resource.uri].state] = resource;
+            } else {
+                console.log("\x1b[33m Not supported resource: "+resource.uri)
+            }
+        })
+
+        var resourceconfig = {
+            "name": "Mbed/Resource-"+id,
+            "version": "0.0.1",
+            "interfaces": interfaces
+        }
+        addResourceType(resourceconfig).then(function(res) {
+            console.log('\x1b[32 Successfully added resource '+res);
+            start(id, initStates, resourceconfig, edgeMgmtClient).then(function(device) {
+                devices[id] = device;
+                resolve(id);
+            }, function(err) {
+                reject('Failed to start device controller ' + JSON.stringify(err));
+            });
         }, function(err) {
-            console.log('\x1b[31m Failed to start device controller ' + JSON.stringify(err));
+            console.log('\x1b[31m Failed to add resource type ' + JSON.stringify(err));
             reject(err);
         });
-    }, function(err) {
-        console.log('\x1b[31m Failed to add resource type ' + JSON.stringify(err));
-        reject(err);
-    });
+    })
 }
 
-module.exports = CreateDevice;
+module.exports = {
+    create: CreateDevice
+};

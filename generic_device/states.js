@@ -1,5 +1,5 @@
 var States = {
-    battery: function(initVal,resourceID){
+    battery: function(initVal,resourceID,edgeMgmt){
         return {
             _battery: initVal,
             get: function() {
@@ -10,7 +10,7 @@ var States = {
             }
         }
     },
-    pressed: function(initVal,resourceID){
+    pressed: function(initVal,resourceID,edgeMgmt){
         return {
             _buttonState: initVal,
             get: function() {
@@ -23,7 +23,7 @@ var States = {
             }
         }
     },
-    contact: function(initVal,resourceID){
+    contact: function(initVal,resourceID,edgeMgmt){
         return {
             _contact: initVal,
             get: function() {
@@ -34,7 +34,7 @@ var States = {
             }
         }
     },
-    tamper: function(initVal,resourceID){
+    tamper: function(initVal,resourceID,edgeMgmt){
         return {
             _tamper: initVal,
             get: function() {
@@ -45,7 +45,7 @@ var States = {
             }
         }
     },
-    lock: function(initVal,resourceID){
+    lock: function(initVal,resourceID,edgeMgmt){
         return {
             _lock: initVal,
             get: function() {
@@ -58,7 +58,7 @@ var States = {
             }
         }
     },
-    flipflop: function(initVal,resourceID){
+    flipflop: function(initVal,resourceID,edgeMgmt){
         return {
             _flipflop: initVal,
             get: function() {
@@ -71,7 +71,7 @@ var States = {
             }
         }
     },
-    humidity: function(initVal,resourceID){
+    humidity: function(initVal,resourceID,edgeMgmt){
         return {
             _humidityValue: initVal,
             get: function() {
@@ -82,7 +82,7 @@ var States = {
             }
         }
     },
-    power: function(initVal,resourceID){
+    power: function(initVal,resourceID,edgeMgmt){
         return {
             _power: initVal,
             get: function() {
@@ -95,7 +95,7 @@ var States = {
             }
         }
     },
-    brightness: function(initVal,resourceID){
+    brightness: function(initVal,resourceID,edgeMgmt){
         return {
             _brightness: initVal,
             get: function() {
@@ -120,7 +120,7 @@ var States = {
             }
         }
     },
-    hsl: function(initVal,resourceID){
+    hsl: function(initVal,resourceID,edgeMgmt){
         return {
             _hsl: initVal,
             get: function() {
@@ -140,7 +140,7 @@ var States = {
             }
         }
     },
-    K: function(initVal,resourceID){
+    K: function(initVal,resourceID,edgeMgmt){
         return {
             _K: initVal,
             get: function() {
@@ -165,7 +165,7 @@ var States = {
             }
         }
     },
-    lastColorCall: function(initVal,resourceID){
+    lastColorCall: function(initVal,resourceID,edgeMgmt){
         return {
             _lastColorCall: initVal,
             get: function() {
@@ -176,7 +176,7 @@ var States = {
             }
         }
     },
-    luminance: function(initVal,resourceID){
+    luminance: function(initVal,resourceID,edgeMgmt){
         return {
             _luminance: initVal,
             get: function() {
@@ -187,7 +187,7 @@ var States = {
             }
         }
     },
-    motion: function(initVal,resourceID){
+    motion: function(initVal,resourceID,edgeMgmt){
         return {
             _motion: initVal,
             get: function() {
@@ -198,7 +198,7 @@ var States = {
             }
         }
     },
-    ultraviolet: function(initVal,resourceID){
+    ultraviolet: function(initVal,resourceID,edgeMgmt){
         return {
             _ultraviolet: initVal,
             get: function() {
@@ -209,7 +209,7 @@ var States = {
             }
         }
     },
-    override: function(initVal,resourceID){
+    override: function(initVal,resourceID,edgeMgmt){
         return {
             _overrideState: initVal,
             get: function() {
@@ -222,7 +222,7 @@ var States = {
             }
         }
     },
-    regulator: function(initVal,resourceID){
+    regulator: function(initVal,resourceID,edgeMgmt){
         return {
             _regulator: initVal,
             get: function() {
@@ -235,7 +235,7 @@ var States = {
             }
         }
     },
-    smoke: function(initVal,resourceID){
+    smoke: function(initVal,resourceID,edgeMgmt){
         return {
             _smoke: initVal,
             get: function() {
@@ -246,7 +246,7 @@ var States = {
             }
         }
     },
-    temperature: function(initVal,resourceID){
+    temperature: function(initVal,resourceID,edgeMgmt){
         return {
             _temperature: initVal,
             get: function() {
@@ -259,7 +259,7 @@ var States = {
             }
         }
     },
-    thermostatMode: function(initVal,resourceID){
+    thermostatMode: function(initVal,resourceID,edgeMgmt){
         return {
             _thermostatMode: initVal,
             get: function() {
@@ -278,7 +278,7 @@ var States = {
             }
         }
     },
-    occupiedCoolTemperatureLevel: function(initVal,resourceID){
+    occupiedCoolTemperatureLevel: function(initVal,resourceID,edgeMgmt){
         return {
             _occupiedCoolTemperatureLevel: initVal,
             get: function() {
@@ -294,7 +294,7 @@ var States = {
             }
         }
     },
-    occupiedHeatTemperatureLevel: function(initVal,resourceID){
+    occupiedHeatTemperatureLevel: function(initVal,resourceID,edgeMgmt){
         return {
             _occupiedHeatTemperatureLevel: initVal,
             get: function() {
@@ -310,7 +310,7 @@ var States = {
             }
         }
     },
-    unoccupiedCoolTemperatureLevel: function(initVal,resourceID){
+    unoccupiedCoolTemperatureLevel: function(initVal,resourceID,edgeMgmt){
         return {
             _unoccupiedCoolTemperatureLevel: initVal,
             get: function() {
@@ -326,7 +326,7 @@ var States = {
             }
         }
     },
-    unoccupiedHeatTemperatureLevel: function(initVal,resourceID){
+    unoccupiedHeatTemperatureLevel: function(initVal,resourceID,edgeMgmt){
         return {
             _unoccupiedHeatTemperatureLevel: initVal,
             get: function() {
@@ -342,7 +342,7 @@ var States = {
             }
         }
     },
-    deadband: function(initVal,resourceID){
+    deadband: function(initVal,resourceID,edgeMgmt){
         return {
             _deadband: initVal,
             get: function() {
@@ -358,7 +358,7 @@ var States = {
             }
         }
     },
-    occupancyMode: function(initVal,resourceID){
+    occupancyMode: function(initVal,resourceID,edgeMgmt){
         return {
             _occupancyMode: initVal,
             get: function() {
@@ -377,7 +377,7 @@ var States = {
             }
         }
     },
-    keypadLockLevel: function(initVal,resourceID){
+    keypadLockLevel: function(initVal,resourceID,edgeMgmt){
         return {
             _keypadLockLevel: initVal,
             get: function() {
@@ -390,7 +390,7 @@ var States = {
             }
         }
     },
-    temperatureDisplayMode: function(initVal,resourceID){
+    temperatureDisplayMode: function(initVal,resourceID,edgeMgmt){
         return {
             _temperatureDisplayMode: initVal,
             get: function() {
@@ -403,7 +403,7 @@ var States = {
             }
         }
     },
-    w1Status: function(initVal,resourceID){
+    w1Status: function(initVal,resourceID,edgeMgmt){
         return {
             _w1Status: initVal,
             get: function() {
@@ -416,7 +416,7 @@ var States = {
             }
         }
     },
-    w2Status: function(initVal,resourceID){
+    w2Status: function(initVal,resourceID,edgeMgmt){
         return {
             _w2Status: initVal,
             get: function() {
@@ -429,7 +429,7 @@ var States = {
             }
         }
     },
-    y1Status: function(initVal,resourceID){
+    y1Status: function(initVal,resourceID,edgeMgmt){
         return {
             _y1Status: initVal,
             get: function() {
@@ -442,7 +442,7 @@ var States = {
             }
         }
     },
-    y2Status: function(initVal,resourceID){
+    y2Status: function(initVal,resourceID,edgeMgmt){
         return {
             _y2Status: initVal,
             get: function() {
@@ -455,7 +455,7 @@ var States = {
             }
         }
     },
-    gStatus: function(initVal,resourceID){
+    gStatus: function(initVal,resourceID,edgeMgmt){
         return {
             _gStatus: initVal,
             get: function() {
@@ -468,7 +468,7 @@ var States = {
             }
         }
     },
-    supplyTemperature: function(initVal,resourceID){
+    supplyTemperature: function(initVal,resourceID,edgeMgmt){
         return {
             _supplyTemp: initVal,
             get: function() {
@@ -481,7 +481,7 @@ var States = {
             }
         }
     },
-    returnTemperature: function(initVal,resourceID){
+    returnTemperature: function(initVal,resourceID,edgeMgmt){
         return {
             _returnTemp: initVal,
             get: function() {
@@ -494,7 +494,7 @@ var States = {
             }
         }
     },
-    thermostatFanMode: function(initVal,resourceID){
+    thermostatFanMode: function(initVal,resourceID,edgeMgmt){
         return {
             _thermostatFanMode: initVal,
             get: function() {
@@ -513,7 +513,7 @@ var States = {
             }
         }
     },
-    thermostatModeStatus: function(initVal,resourceID){
+    thermostatModeStatus: function(initVal,resourceID,edgeMgmt){
         return {
             _thermostatModeStatus: initVal,
             get: function() {
@@ -532,7 +532,7 @@ var States = {
             }
         }
     },
-    thermostatFanStatus: function(initVal,resourceID){
+    thermostatFanStatus: function(initVal,resourceID,edgeMgmt){
         return {
             _thermostatFanStatus: initVal,
             get: function() {
