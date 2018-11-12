@@ -253,9 +253,18 @@ var States = {
                 return Promise.resolve(this._temperature);
             },
             set: function(value) {
-                this._temperature = value;
-                dev$.publishResourceStateChange(resourceID,'temperature',this._temperature)
-                return Promise.resolve();
+                var self = this;
+                if(typeof value != 'number') return Promise.reject('Not a number');
+                var buf = Buffer.alloc(8);
+                buf.writeDoubleBE(value);
+                var base64Val = buf.toString('base64');
+                edgeMgmt.write_resource(resourceID, '/3303/0/5700', base64Val).then(resp => {
+                    self._temperature = value;
+                    dev$.publishResourceStateChange(resourceID,'temperature',self._temperature)
+                    return Promise.resolve('Temperature set successfully, Response: '+resp);
+                }, err => {console.log("mbed: ERROR- "+JSON.stringify(err))
+                    return Promise.reject(err)
+                })
             }
         }
     },
