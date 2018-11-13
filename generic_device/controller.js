@@ -13,17 +13,22 @@ var Controller = {
         this._supportedStates = options.supportedStates;
         this._edgeMgmt = options.edgeMgmtClient;
         this.resources = {};
+        this.resourceMap = {};
         var resources={}
+        var resourceMap={}
         options.supportedStates.forEach(function(state) {
             resources[options.initStates[state].uri] = options.initStates[state].val;
+            resourceMap[options.initStates[state].uri] = state;
         })
         this.resources = resources;
+        this.resourceMap = resourceMap;
         //"reachable" event
         self.emit('reachable');
 
         setStates(options.supportedStates, this);
         self.onResourceChange = function(uri, val) {
             self.resources[uri] = val;
+            dev$.publishResourceStateChange(self._resourceID, self.resourceMap[uri],val);
         }
     },
     stop: function() {

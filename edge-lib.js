@@ -36,12 +36,14 @@ RemoteClientService.prototype.init = async function() {
     // Poll edge-core registered devices every 60 secs and for new found device, register it in devicejs
     setInterval(function() {
         self.edgeMgmt.getDevices().then(devices => {
+            console.log(CON_PR, "Mbed devices: "+JSON.stringify(devices));
             var registeredDevices = self.devices.filter(d => d.getRegistrationStatus());
             Object.keys(self.mbedDevices).forEach(function(endpointName) {
                 var mbedDevice = self.mbedDevices[endpointName];
                 if(devices.data.find(dev => {
                         return dev.endpointName == endpointName;
                     }) == undefined) {
+                    console.log(CON_PR, "Removing mbed device: "+endpointName+" from devicejs");
                     DevJSDevice.remove(endpointName);
                     delete self.mbedDevices[endpointName];
                 } else {
