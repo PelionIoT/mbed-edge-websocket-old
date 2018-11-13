@@ -15,6 +15,7 @@ var devices = {};
 
 function addResourceType(config) {
     return new Promise(function(resolve, reject) {
+        if(config.interfaces.length <1) return reject('No mapped interfaces')
         dev$.addResourceType(config).then(function() {
             resolve(config.name);
         }, function(err) {

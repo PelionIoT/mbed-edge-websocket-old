@@ -97,7 +97,7 @@ EdgeMgmtClient.prototype.write_resource = async function(endpointName,uri,base64
             if (!error) {
                 resolve(response);
             } else {
-                reject(error);
+                reject(error.message);
             }
         });
     });
