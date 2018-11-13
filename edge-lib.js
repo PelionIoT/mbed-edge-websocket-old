@@ -10,7 +10,7 @@ function RemoteClientService(socket_path, pt_api_path, mgmt_api_path, name) {
     this.edgeMgmt = new EdgeMgmt(socket_path, mgmt_api_path, name);
 
     this.devices = [];
-    this.mbedDevices = [];
+    this.mbedDevices = {};
 }
 
 function parse(stringVal,type) {
@@ -37,40 +37,37 @@ RemoteClientService.prototype.init = async function() {
     setInterval(function() {
         self.edgeMgmt.getDevices().then(devices => {
             var registeredDevices = self.devices.filter(d => d.getRegistrationStatus());
-            for(var i = 0; i < self.mbedDevices.length; i++) {
-                var mbedDevice = self.mbedDevices[i];
+            Object.keys(self.mbedDevices).forEach(function(endpointName) {
+                var mbedDevice = self.mbedDevices[endpointName];
                 if(devices.data.find(dev => {
-                        return dev.endpointName == mbedDevice.endpointName;
+                        return dev.endpointName == endpointName;
                     }) == undefined) {
-                    DevJSDevice.remove(mbedDevice.endpointName);
-                    self.mbedDevices.splice(i,1)
+                    DevJSDevice.remove(endpointName);
+                    delete self.mbedDevices[endpointName];
                 } else {
-                    mbedDevice.resources.forEach(resource => {
-                        self.edgeMgmt.read_resource(mbedDevice.endpointName, resource.uri).then(val => {
-                            if(resource.val != parse(val.stringValue, val.type)) {
-                                console.log(CON_PR,mbedDevice.endpointName+" to be updated: resource "+resource.uri+" changed "+resource.val+"->"+parse(val.stringValue, val.type));
-                                //TODO: Write in devicejs
+                    Object.keys(mbedDevice.resources).forEach(uri => {
+                        self.edgeMgmt.read_resource(endpointName, uri).then(val => {
+                            var parsedVal = parse(val.stringValue, val.type);
+                            if(mbedDevice.resources[uri] != parsedVal) {
+                                mbedDevice.onResourceChange(uri, parsedVal);
                             }
                         })
                     })
                 }
-            }
+            })
             devices.data.forEach(device => {
                 if(registeredDevices.find(dev => {
                         return dev.endpoint == device.endpointName;
-                    }) == undefined && self.mbedDevices.find(dev => {
-                        return dev.endpointName == device.endpointName;
-                    }) == undefined) {
+                    }) == undefined && self.mbedDevices[device.endpointName] == undefined) {
                     console.log(CON_PR, "Found new mbed device: "+device.endpointName);
-                    var initialStates = {};
-                    device.resources.forEach(resource => {
+                    DevJSDevice.create(device,self.edgeMgmt).then(devController => {
+                        console.log(CON_PR,"\x1b[32m Successfully registered "+device.endpointName+" in devicejs");
+                        self.mbedDevices[device.endpointName] = devController;
+                        device.resources.forEach(resource => {
                         self.edgeMgmt.read_resource(device.endpointName, resource.uri).then(val => {
-                            resource.val = parse(val.stringValue, val.type);
+                            devController.onResourceChange(resource.uri, parse(val.stringValue, val.type));
                         })
                     })
-                    DevJSDevice.create(device,self.edgeMgmt).then(response => {
-                        console.log(CON_PR,"\x1b[32m Successfully registered "+device.endpointName+" in devicejs");
-                        self.mbedDevices.push(device);
                     },reject => {
                         console.log(CON_PR,"\x1b[31m Failed to add "+device.endpointName+" in devicejs, err - "+reject);
                     })

@@ -1,8 +1,8 @@
 var States = require("./states")
 
-function setStates(initStates,Controller) {
-    Object.keys(initStates).forEach(state => {
-        Controller.state[state] = States[state](initStates[state].val,Controller._resourceID,Controller._edgeMgmt);
+function setStates(supportedStates,Controller) {
+    supportedStates.forEach(state => {
+        Controller.state[state] = States[state](Controller);
     })
 }
 
@@ -12,10 +12,19 @@ var Controller = {
         this._resourceID = options.id;
         this._supportedStates = options.supportedStates;
         this._edgeMgmt = options.edgeMgmtClient;
+        this.resources = {};
+        var resources={}
+        options.supportedStates.forEach(function(state) {
+            resources[options.initStates[state].uri] = options.initStates[state].val;
+        })
+        this.resources = resources;
         //"reachable" event
         self.emit('reachable');
 
-        setStates(options.initStates, this)
+        setStates(options.supportedStates, this);
+        self.onResourceChange = function(uri, val) {
+            self.resources[uri] = val;
+        }
     },
     stop: function() {
     },
