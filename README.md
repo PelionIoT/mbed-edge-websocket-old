@@ -18,5 +18,5 @@ Example usage:
 1. Run the example application:
 
     ```
-    $ node example/buttons.js
+    $ node exampleDevices/temperatureSensor.js
     ```
