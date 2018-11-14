@@ -85,6 +85,7 @@ function CreateDevice(mbedDevice,edgeMgmtClient) {
             console.log('\x1b[32 Successfully added resource '+res);
             start(id, initStates, resourceconfig, edgeMgmtClient).then(function(device) {
                 devices[id] = device;
+                ddb.shared.put('WigWagUI:appData.resource.' + id + '.name', id);
                 resolve(device);
             }, function(err) {
                 reject('Failed to start device controller ' + JSON.stringify(err));
