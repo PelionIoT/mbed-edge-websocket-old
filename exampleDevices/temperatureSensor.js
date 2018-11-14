@@ -136,7 +136,7 @@ EdgeJsonRpcExample.prototype.registerExampleDevice = async function() {
     return new Promise((resolve, reject) => {
 
         params = self._createDeviceParams(32.5 /* temp */,
-                                         'celsius' /* mode */);
+                                         'fahrenheit' /* mode */);
 
         let timeout = setTimeout(() => {
             reject('Timeout');
