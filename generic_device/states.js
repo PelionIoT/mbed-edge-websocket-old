@@ -1,5 +1,6 @@
 var States = {
     temperature: function(devController){
+        devController.resources['/3303/0/5700'] = 1.0; //default state value
         return {
             get: function() {
                 return Promise.resolve(devController.resources['/3303/0/5700']);
@@ -23,6 +24,7 @@ var States = {
         }
     },
     temperatureDisplayMode: function(devController){
+        devController.resources['/3303/0/5701'] = "fahrenheit"; //default state value
         return {
             get: function() {
                 return Promise.resolve(devController.resources['/3303/0/5701']);

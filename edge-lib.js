@@ -1,87 +1,27 @@
 const MbedDevice = require('./device');
 const EdgeRpc = require('./edge-rpc-client');
 const EdgeMgmt = require('./edge-mgmt-client');
-const DevJSDevice = require('./generic_device');
+const MgmtClient = require('./mgmt-client');
 
 const CON_PR = '\x1b[34m[ClientService]\x1b[0m';
 
 function RemoteClientService(socket_path, pt_api_path, mgmt_api_path, name) {
+    this.devices = [];
     this.edgeRpc = new EdgeRpc(socket_path, pt_api_path, name);
     this.edgeMgmt = new EdgeMgmt(socket_path, mgmt_api_path, name);
-
-    this.devices = [];
-    this.mbedDevices = {};
-}
-
-function parse(stringVal,type) {
-    let value;
-
-    if (type === 'int') {
-        value = parseInt(stringVal);
-    } else if (type === 'float') {
-        value = parseFloat(stringVal);
-    } else if (type === 'string') {
-        value = stringVal;
-    } else {
-        value = 0;
-    }
-
-    return value;
+    
+    this.mgmtClient = new MgmtClient(this.edgeMgmt, this.devices);
 }
 
 RemoteClientService.prototype.init = async function() {
     var self = this;
     // Setup client to edge-core websocket api /1/mgmt
-    self.edgeMgmt.init();
-    // Poll edge-core registered devices every 60 secs and for new found device, register it in devicejs
-    setInterval(function() {
-        self.edgeMgmt.getDevices().then(devices => {
-            console.log(CON_PR, "Mbed devices: "+JSON.stringify(devices));
-            var registeredDevices = self.devices.filter(d => d.getRegistrationStatus());
-            Object.keys(self.mbedDevices).forEach(function(endpointName) {
-                var mbedDevice = self.mbedDevices[endpointName];
-                if(devices.data.find(dev => {
-                        return dev.endpointName == endpointName;
-                    }) == undefined) {
-                    console.log(CON_PR, "Removing mbed device: "+endpointName+" from devicejs");
-                    DevJSDevice.remove(endpointName);
-                    delete self.mbedDevices[endpointName];
-                } else {
-                    Object.keys(mbedDevice.resources).forEach(uri => {
-                        self.edgeMgmt.read_resource(endpointName, uri).then(val => {
-                            var parsedVal = parse(val.stringValue, val.type);
-                            if(mbedDevice.resources[uri] != parsedVal) {
-                                mbedDevice.onResourceChange(uri, parsedVal);
-                            }
-                        })
-                    })
-                }
-            })
-            devices.data.forEach(device => {
-                if(registeredDevices.find(dev => {
-                        return dev.endpoint == device.endpointName;
-                    }) == undefined && self.mbedDevices[device.endpointName] == undefined) {
-                    console.log(CON_PR, "Found new mbed device: "+device.endpointName);
-                    DevJSDevice.create(device,self.edgeMgmt).then(devController => {
-                        console.log(CON_PR,"\x1b[32m Successfully registered "+device.endpointName+" in devicejs");
-                        self.mbedDevices[device.endpointName] = devController;
-                        device.resources.forEach(resource => {
-                        self.edgeMgmt.read_resource(device.endpointName, resource.uri).then(val => {
-                            devController.onResourceChange(resource.uri, parse(val.stringValue, val.type));
-                        })
-                    })
-                    },reject => {
-                        console.log(CON_PR,"\x1b[31m Failed to add "+device.endpointName+" in devicejs, err - "+reject);
-                    })
-                }
-            })
-        })
-    }, 60000)
+    self.mgmtClient.init();
     return self.edgeRpc.init();
 };
 
 RemoteClientService.prototype.deinit = async function() {
-    this.edgeMgmt.deinit();
+    this.mgmtClient.deinit();
     return this.edgeRpc.deinit();
 };
 
