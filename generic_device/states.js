@@ -45,6 +45,105 @@ var States = {
                 })
             }
         }
+    },
+    pressed: function(devController){
+        devController.resources['/3303/0/5700'] = false; //default state value
+        return {
+            get: function() {
+                return Promise.resolve(devController.resources['/3347/0/5850']);
+            },
+            set: function(value) {
+                var self = this;
+                if(typeof value !== 'boolean') return Promise.reject('Not a boolean');
+                var buf = Buffer.alloc(4);
+                buf.writeInt32BE(value?1:0);
+                var base64Val = buf.toString('base64');
+                devController._edgeMgmt.write_resource(devController._resourceID, '/3347/0/5850', base64Val).then(resp => {
+                    devController.resources['/3347/0/5850'] = value;
+                    dev$.publishResourceStateChange(devController._resourceID,'pressed',devController.resources['/3347/0/5850'])
+                    return Promise.resolve('Pressed set successfully, Response: '+resp);
+                }, err => {
+                    return Promise.reject(err)
+                })
+            }
+        }
+    },
+    power: function(devController){
+        devController.resources['/3311/0/5850'] = "off"; //default state value
+        return {
+            get: function() {
+                return Promise.resolve(devController.resources['/3311/0/5850']);
+            },
+            set: function(value) {
+                var self = this;
+                if(typeof value !== 'string') return Promise.reject('Not a string');
+                if(value !== 'on' && value !== 'off') return Promise.reject('Invalid power value');
+                var buf = Buffer.alloc(4);
+                if(value == 'on') {
+                    buf.writeInt32BE(1)
+                } else {
+                    buf.writeInt32BE(0)
+                }
+                var base64Val = buf.toString('base64');
+                devController._edgeMgmt.write_resource(devController._resourceID, '/3311/0/5850', base64Val).then(resp => {
+                    devController.resources['/3311/0/5850'] = value;
+                    dev$.publishResourceStateChange(devController._resourceID,'power',devController.resources['/3311/0/5850'])
+                    return Promise.resolve('Power set successfully, Response: '+resp);
+                }, err => {
+                    return Promise.reject(err)
+                })
+            }
+        }
+    },
+    brightness: function(devController){
+        devController.resources['/3311/0/5851'] = 0; //default state value
+        return {
+            get: function() {
+                return Promise.resolve(devController.resources['/3311/0/5851']);
+            },
+            set: function(value) {
+                var self = this;
+                if(typeof value !== 'number') return Promise.reject('Not a number');
+                if(value < 0 || value >  1) return Promise.reject('Invalid brightness value');
+                var buf = Buffer.alloc(4);
+                buf.writeInt32BE(parseInt(value*100));
+                var base64Val = buf.toString('base64');
+                devController._edgeMgmt.write_resource(devController._resourceID, '/3311/0/5851', base64Val).then(resp => {
+                    devController.resources['/3311/0/5851'] = value;
+                    dev$.publishResourceStateChange(devController._resourceID,'brightness',devController.resources['/3311/0/5851'])
+                    return Promise.resolve('Brightness set successfully, Response: '+resp);
+                }, err => {
+                    return Promise.reject(err)
+                })
+            }
+        }
+    },
+    hsl: function(devController){
+        devController.resources['/3335/0/5706'] = {h:0,s:0,l:0}; //default state value
+        return {
+            get: function() {
+                return Promise.resolve(devController.resources['/3335/0/5706']);
+            },
+            set: function(value) {
+                var self = this;
+                if(typeof value !== 'object' || !value.hasOwnProperty('h') || !value.hasOwnProperty('s') || !value.hasOwnProperty('l')) {
+                    return Promise.reject('Value should be of type object {h:[0 - 1], s:[0 - 1], l: [0 - 1]');
+                }
+                if(value.h < 0 || value.h > 1 || value.s < 0 || value.s > 1 || value.l < 0 || value.l > 1) {
+                    return Promise.reject('Value of hsl should be within range 0 to 1');
+                }
+                var valueToWrite = value.h.toString()+','+value.s+','+value.l;
+                var buf = Buffer.from(valueToWrite);
+                var base64Val = buf.toString('base64');
+                devController._edgeMgmt.write_resource(devController._resourceID, '/3335/0/5706', base64Val).then(resp => {
+                    devController.resources['/3335/0/5706'] = value;
+                    dev$.publishResourceStateChange(devController._resourceID,'hsl',devController.resources['/3335/0/5706'])
+                    return Promise.resolve('hsl set successfully, Response: '+resp);
+                }, err => {
+                    return Promise.reject(err)
+                })
+            }
+        }
     }
 };
 

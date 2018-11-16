@@ -13,6 +13,48 @@ var map = {
         interface: 'Facades/TemperatureDisplayMode',
         state: 'temperatureDisplayMode',
         type: 'string'
+    },
+    '/3347/0/5850': {
+        interface: 'Facades/Button',
+        state: 'pressed',
+        type: 'boolean'
+    },
+    '/3311/0/5850': {
+        interface: 'Facades/Switchable',
+        state: 'power',
+        parse: (strVal)=>{
+            if(parseInt(strVal) == 0) return 'off'
+            else if(parseInt(strVal) == 1) return 'on'
+        }
+    },
+    '/3311/0/5851': {
+        interface: 'Facades/Dimmable',
+        state: 'brightness',
+        parse: (strVal)=>{
+            if(parseInt(strVal) >= 0 && parseInt(strVal) =< 100)
+                return parseInt(strVal)/100;
+        }
+    },
+    '/3335/0/5706': {
+        interface: 'Facades/Colorable',
+        state: 'hsl',
+        parse: (strVal)=>{
+            try {
+                var vals = strVal.split(',')
+                var hsl = {
+                    h: parseFloat(vals[0]),
+                    s: parseFloat(vals[1]),
+                    l: parseFloat(vals[2])
+                }
+                if( hsl.h <= 1 && hsl.h >= 0 &&
+                    hsl.s <= 1 && hsl.s >= 0 &&
+                     hsl.l <= 1 && hsl.l >= 0) {
+                    return hsl;
+                }
+            } catch(ex) {
+                console.log(CON_PR,"\x1b[33m Could not parse hsl value "+strVal+", error- "+ex)
+            }
+        }
     }
 }
 
