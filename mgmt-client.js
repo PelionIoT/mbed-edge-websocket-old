@@ -31,7 +31,7 @@ var map = {
         interface: 'Facades/Dimmable',
         state: 'brightness',
         parse: (strVal)=>{
-            if(parseInt(strVal) >= 0 && parseInt(strVal) =< 100)
+            if(parseInt(strVal) >= 0 && parseInt(strVal) <= 100)
                 return parseInt(strVal)/100;
         }
     },
@@ -179,7 +179,7 @@ MGMTClient.prototype.init = async function() {
                                 if(parsedVal == undefined) {
                                     console.log(CON_PR,"\x1b[31m Failed to parse "+device.endpointName+" resource "+resource.uri+" val "+JSON.stringify(val));
                                 } else {
-                                    console.log(CON_PR, "Setting "+endpointName+" "+uri+" value: "+parsedVal);
+                                    console.log(CON_PR, "Setting "+device.endpointName+" "+resource.uri+" value: "+parsedVal);
                                     devController.onResourceChange(resource.uri, parse(resource.uri, val.stringValue));
                                 }
                             })
@@ -235,12 +235,12 @@ MGMTClient.prototype.removeDevice = function(id) {
         console.log(CON_PR,'\x1b[33m Could not find resource named ' + id);
     } else {
         return self.devices[id].stop().then(function() {
-            delete self.devices[endpointName];
+            delete self.devices[id];
             console.log(CON_PR,'\x1b[32m Successfully stopped ' + id);
         }, function(err){
             if(err.status === 404) {
                 console.log('\x1b[33m Could not stop resource ' + id + JSON.stringify(err));
-                delete self.devices[endpointName];
+                delete self.devices[id];
             } else {
                 console.log('\x1b[31m Stop failed with error ' + err + JSON.stringify(err));
             }
