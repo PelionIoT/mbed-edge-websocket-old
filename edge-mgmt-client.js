@@ -110,12 +110,13 @@ EdgeMgmtClient.prototype.init = async function() {
 };
 
 EdgeMgmtClient.prototype.deinit = async function() {
-    if (!this._is_open) return true;
+    var self = this;
+    if (!self._is_open) return true;
 
     console.log(INFO, 'Disconnecting from Mbed Edge WebSocket.');
     self.client.disconnect((error, response) => {
         if (!error) {
-            this._is_open = false;
+            self._is_open = false;
             console.log(SUCCESS, 'Mbed Edge Websocket disconnected succesfully.');
         } else {
             console.log(WARN, 'Mbed Edge Websocket disconnecting failed. Error: ', error);
